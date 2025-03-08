@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Super Stopwatch & Timer</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        /* BASE STYLES */
+        body {
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: linear-gradient(135deg, #1e3c72, #2a5298);
+            overflow: hidden;
+            color: #fff;
+            transition: background 0.5s ease-in-out;
+        }
+
+        .container {
+            text-align: center;
+            padding: 40px 60px;
+            background: rgba(0, 0, 0, 0.8);
+            border-radius: 20px;
+            box-shadow: 0 0 30px rgba(0, 0, 0, 0.4);
+            width: 320px;
+            transition: all 0.3s ease-in-out;
+        }
+
+        #display {
+            font-size: 120px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            letter-spacing: 5px;
+            color: #00FFB3;
+            transition: all 0.3s ease;
+        }
+
+        .controls button {
+            font-size: 20px;
+            padding: 20px 30px;
+            margin: 10px;
+            background: linear-gradient(45deg, #ff6b81, #ff7a59);
+            border: none;
+            border-radius: 12px;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .controls button:hover {
+            background: linear-gradient(45deg, #ff5c65, #ff4a42);
+            transform: scale(1.1);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.4);
+        }
+
+        .controls button:active {
+            transform: scale(1.05);
+            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Dark/Light Mode */
+        .dark-mode {
+            background: #101010;
+        }
+
+        .light-mode {
+            background: #f5f5f5;
+            color: #333;
+        }
+
+        /* Toggle Mode Button */
+        .mode-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            padding: 12px 20px;
+            background-color: #00FFB3;
+            color: #000;
+            border: none;
+            border-radius: 50px;
+            font-size: 18px;
+            cursor: pointer;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .mode-toggle:hover {
+            background-color: #00e6a0;
+            box-shadow: 0 8px 18px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Media Queries */
+        @media screen and (max-width: 600px) {
+            #display {
+                font-size: 80px;
+            }
+
+            .controls button {
+                font-size: 18px;
+                padding: 16px 24px;
+            }
+
+            .container {
+                width: 280px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <button class="mode-toggle" id="modeToggle" onclick="toggleMode()">Switch to Dark Mode</button>
+
+    <div class="container" id="timerContainer">
+        <div id="display">00:00:00</div>
+        <div class="controls">
+            <button id="startStop" onclick="startStop()">Start</button>
+            <button id="reset" onclick="reset()">Reset</button>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+    <script>
+        let timer;
+        let seconds = 0;
+        let isRunning = false;
+        let isDarkMode = true;
+
+        // Format the time as HH:MM:SS
+        function formatTime(seconds) {
+            let hrs = Math.floor(seconds / 3600);
+            let mins = Math.floor((seconds % 3600) / 60);
+            let secs = seconds % 60;
+            return `${pad(hrs)}:${pad(mins)}:${pad(secs)}`;
+        }
+
+        // Padding for numbers less than 10
+        function pad(number) {
+            return number < 10 ? '0' + number : number;
+        }
+
+        // Start/Stop button functionality
+        function startStop() {
+            if (isRunning) {
+                clearInterval(timer);
+                document.getElementById("startStop").innerText = "Start";
+            } else {
+                timer = setInterval(function () {
+                    seconds++;
+                    document.getElementById("display").innerText = formatTime(seconds);
+                    playSound("tick");
+                }, 1000);
+                document.getElementById("startStop").innerText = "Stop";
+            }
+            isRunning = !isRunning;
+        }
+
+        // Reset button functionality
+        function reset() {
+            clearInterval(timer);
+            seconds = 0;
+            document.getElementById("display").innerText = formatTime(seconds);
+            document.getElementById("startStop").innerText = "Start";
+            playSound("reset");
+        }
+
+        // Switch Dark/Light Mode
+        function toggleMode() {
+            const body = document.body;
+            const container = document.getElementById('timerContainer');
+            const modeButton = document.getElementById('modeToggle');
+
+            body.classList.toggle('light-mode');
+            body.classList.toggle('dark-mode');
+            container.classList.toggle('light-mode');
+            container.classList.toggle('dark-mode');
+
+            isDarkMode = !isDarkMode;
+
+            if (isDarkMode) {
+                modeButton.innerText = "Switch to Light Mode";
+            } else {
+                modeButton.innerText = "Switch to Dark Mode";
+            }
+        }
+
+        // Sound effect for start/stop/reset
+        function playSound(action) {
+            let audio = new Audio();
+
+            if (action === "tick") {
+                audio.src = 'https://www.soundjay.com/button/beep-07.wav'; // Beep sound for ticking
+            } else if (action === "reset") {
+                audio.src = 'https://www.soundjay.com/button/beep-10.wav'; // Reset sound
+            }
+
+            audio.play();
+        }
+    </script>
+</body>
+
+</html>
